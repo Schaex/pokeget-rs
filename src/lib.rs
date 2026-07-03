@@ -6,5 +6,5 @@ pub mod pokemon;
 pub mod sprites;
 
 #[derive(RustEmbed)]
-#[folder = "data/pokesprite/pokemon-gen8"]
+#[folder = "data/schaex_merged_sprites"]
 pub struct Data;

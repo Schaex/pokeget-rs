@@ -18,6 +18,7 @@ pub enum Region {
     Kalos,
     Alola,
     Galar,
+    Paldea
 }
 
 /// Enum used to assist parsing user input.
@@ -25,7 +26,7 @@ pub enum Region {
 /// It can sort all types of inputs, and then evaluate them to a filename.
 #[derive(PartialEq, Eq)]
 pub enum Selection {
-    /// When a random pokemon is selected (`0` or `random`).
+    /// When a random pokémon is selected (`0` or `random`).
     Random,
 
     /// When a region is selected (e.g Kanto)
@@ -34,7 +35,7 @@ pub enum Selection {
     /// When a DexID is selected (number larger than 0).
     DexId(usize),
 
-    /// When a pokemon name/id is selected.
+    /// When a pokémon name/id is selected.
     Name(String),
 }
 
@@ -63,12 +64,13 @@ impl Selection {
                 "kalos" => Selection::Region(Region::Kalos),
                 "alola" => Selection::Region(Region::Alola),
                 "galar" => Selection::Region(Region::Galar),
+                "paldea" => Selection::Region(Region::Paldea),
                 _ => Selection::Name(arg),
             }
         }
     }
 
-    /// Evaluates the selection and returns a pokemon filename.
+    /// Evaluates the selection and returns a pokémon filename.
     pub fn eval(self, list: &List) -> String {
         match self {
             Selection::Random => list.random(),
@@ -86,26 +88,26 @@ impl Selection {
     }
 }
 
-/// The struct used to represent a Pokemon's data.
-/// This includes it's file path, formatted name, sprite, and attributes.
+/// The struct used to represent a pokémon's data.
+/// This includes its file path, formatted name, sprite, and attributes.
 pub struct Pokemon<'a> {
-    /// The path of the Pokemon in pokesprite.
+    /// The path of the pokémon in pokesprite.
     /// Eg. `regular/abra.png`
     pub path: String,
 
-    /// The formatted name of the pokemon, usually gotten from a [List].
+    /// The formatted name of the pokémon, usually gotten from a [List].
     pub name: String,
 
-    /// The sprite of the Pokemon, as a [DynamicImage].
+    /// The sprite of the pokémon, as a [DynamicImage].
     pub sprite: DynamicImage,
 
-    /// Data, like the form and whether a pokemon is shiny or not.
+    /// Data, like the form and whether a pokémon is shiny or not.
     pub attributes: &'a Attributes,
 }
 
 impl<'a> Pokemon<'a> {
-    /// Creates a new pokemon.
-    /// This also fetches the sprite & formats the name.
+    /// Creates a new pokémon.
+    /// This also fetches the sprite and formats the name.
     pub fn new(arg: String, list: &List, attributes: &'a Attributes) -> Self {
         let selection = Selection::parse(arg);
         let is_random = selection == Selection::Random;
@@ -115,7 +117,7 @@ impl<'a> Pokemon<'a> {
         let path = attributes.path(&name, is_random, is_region);
         let bytes = Data::get(&path)
             .unwrap_or_else(|| {
-                eprintln!("pokemon not found");
+                eprintln!("pokémon not found");
                 exit(1)
             })
             .data
@@ -131,18 +133,18 @@ impl<'a> Pokemon<'a> {
     }
 }
 
-/// Handles parsing the form, as well as whether a pokemon is female or shiny.
+/// Handles parsing the form, as well as whether a pokémon is female or shiny.
 pub struct Attributes {
     pub form: String,
     pub female: bool,
     pub shiny: bool,
 }
 
-/// Pokemon attribues, like whether it's shiny, female, and it's form.
+/// Pokémon attribues, like whether it's shiny, female, and it's form.
 impl Attributes {
-    /// Determine whether a pokemon should be shiny, based on a random rate (`DEFAULT_SHINY_RATE`).
+    /// Determine whether a pokémon should be shiny, based on a random rate (`DEFAULT_SHINY_RATE`).
     ///
-    /// If the user specified that they want a shiny pokemon, then this function is irrelevant.
+    /// If the user specified that they want a shiny pokémon, then this function is irrelevant.
     fn rate_is_shiny() -> bool {
         let rate = match std::env::var("POKEGET_SHINY_RATE")
             .map_err(|_| false)
@@ -170,6 +172,7 @@ impl Attributes {
             Args { gmax: true, .. } => "gmax",
             Args { hisui: true, .. } => "hisui",
             Args { galar: true, .. } => "galar",
+            Args { paldea: true, .. } => "paldea",
             _ => &args.form,
         }
         .to_string();
@@ -189,7 +192,7 @@ impl Attributes {
     pub fn path(&self, name: &str, random: bool, region: bool) -> String {
         let mut filename = name.to_owned();
 
-        // The form shouldn't be applied to random or region pokemon.
+        // The form shouldn't be applied to random or region pokémon.
         let is_random = random || region;
         if !self.form.is_empty() && !is_random {
             filename.push_str(&format!("-{}", self.form));
@@ -208,7 +211,7 @@ impl Attributes {
                 "female/"
             } else {
                 ""
-            }, // Random or region pokemon also shouldn't follow the female rule.
+            }, // Random or region pokémon also shouldn't follow the female rule.
             filename.trim()
         );
 

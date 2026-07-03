@@ -7,8 +7,8 @@ use bimap::BiHashMap;
 
 /// A parsed representation of `names.csv`.
 ///
-/// Used to derive filenames from Pokedex ID's, and to
-/// format image filenames back into proper pokemon names.
+/// Used to derive filenames from Pokédex ID's, and to
+/// format image filenames back into proper pokémon names.
 pub struct List {
     /// The Pokedex IDs and their corresponding filenames.
     ids: BiHashMap<usize, String>,
@@ -20,13 +20,13 @@ pub struct List {
 impl List {
     /// Reads a new [`List`] from `data/names.csv`.
     pub fn read() -> Self {
-        const FILE: &'static str = include_str!("../data/names.csv");
+        const FILE: &'static str = include_str!("../data/names_schaex.csv");
 
         let mut reader = csv::ReaderBuilder::new()
             .has_headers(false)
             .from_reader(Cursor::new(FILE));
 
-        const CAPACITY: usize = 1000;
+        const CAPACITY: usize = 1025;
 
         let mut ids = BiHashMap::with_capacity(CAPACITY);
         let mut names = Vec::with_capacity(CAPACITY);
@@ -62,18 +62,18 @@ impl List {
         name.clone()
     }
 
-    /// Gets a pokemon filename by a Dex ID.
+    /// Gets a pokémon filename by a Dex ID.
     pub fn get_by_id(&self, id: usize) -> Option<&String> {
         self.ids.get_by_left(&id)
     }
 
-    /// Gets a random pokemon & returns it's filename.
+    /// Gets a random pokémon and returns its filename.
     pub fn random(&self) -> String {
         let idx = rand::random_range(0..self.ids.len());
         self.ids.get_by_left(&idx).unwrap().clone()
     }
 
-    /// Gets a random pokemon by region
+    /// Gets a random pokémon by region
     pub fn get_by_region(&self, region: Region) -> String {
         let region = match region {
             Region::Kanto => 0..=151,
@@ -84,6 +84,7 @@ impl List {
             Region::Kalos => 650..=721,
             Region::Alola => 722..=809,
             Region::Galar => 810..=905,
+            Region::Paldea => 906..=1025,
         };
 
         let idx = rand::random_range(region);
