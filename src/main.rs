@@ -26,7 +26,7 @@ fn main() {
     let combined = sprites::combine(&pokemon);
     if !args.hide_name {
         let names: Vec<&str> = pokemon.iter().map(|x| x.name.as_ref()).collect();
-        eprintln!("{}", names.join(", "));
+        println!("{}", names.join(", "));
     }
 
     println!("{}", showie::render(&combined));
